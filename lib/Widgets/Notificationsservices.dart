@@ -93,13 +93,27 @@ class NotificationService {
     );
     NotificationDetails notis = NotificationDetails(
         iOS: darwinNotificationDetails, android: androidNotificationDetails);
+      TZDateTime _schedulesDailyTime(TimeOfDay timeOfDay) {
+      final now = TZDateTime.now(local);
+      print(now);
+      TZDateTime scheduledatee = TZDateTime(local, now.year, now.month, now.day,
+          timeOfDay.hour, timeOfDay.minute);
+      print(scheduledatee);
+      print(scheduledatee.runtimeType);
+
+      if (scheduledatee.isBefore(now)) {
+        scheduledatee = scheduledatee.add(const Duration(days: 1));
+      }
+      return scheduledatee;
+    }
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
         1,
         title,
         body,
         androidAllowWhileIdle: true,
-        TZDateTime.from(datetime, local),
+          _schedulesDailyTime(
+            TimeOfDay(hour: datetime.hour, minute: datetime.minute)),
         notis,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime);
