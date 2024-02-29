@@ -47,10 +47,14 @@ class _TodoPageState extends State<TodoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
+        elevation: 0,
+        backgroundColor: Colors.teal.shade500,
         actions: [
           CustomIconButton(
-              icon: Icon(Icons.dark_mode),
+              icon: Icon(
+                Icons.dark_mode,
+                color: Colors.white,
+              ),
               press: () {
                 ThemeService().switchtheme();
                 NotificationService.showNotification(
@@ -68,16 +72,19 @@ class _TodoPageState extends State<TodoPage> {
             },
           ),
         ],
-        title: const Text(
-          "Todo List Application",
-          style: TextStyle(color: Colors.white, fontSize: 18),
+        title: const Padding(
+          padding: EdgeInsets.only(left: 8.0),
+          child: Text(
+            "Todo List Application",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _navigateAndDisplaySelection(context);
         },
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.teal.shade500,
         child: const Icon(
           Icons.add,
           color: Colors.white,
@@ -93,12 +100,19 @@ class _TodoPageState extends State<TodoPage> {
                       itemCount: allmodels.length,
                       itemBuilder: (context, index) {
                         final model = allmodels[index];
+
                         Future<void> navigateandeditdatas(
                             BuildContext context) async {
                           final results = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => UpdateDate(
+                                      initialtitle: model.title!,
+                                      initialdescriptions: model.descriptions!,
+                                      iscompleted: model.iscompleted,
+                                      imptaskearlier: model.imptaskearlier,
+                                      initialdatetime:
+                                          model.datetime!.toString(),
                                       funct: fetchmodelfromDatabase(),
                                       model: model)));
                           setState(() {
@@ -107,66 +121,177 @@ class _TodoPageState extends State<TodoPage> {
                         }
 
                         return Padding(
-                          padding: const EdgeInsets.all(6.0),
+                          padding: const EdgeInsets.only(
+                              top: 8.0, left: 7.0, right: 7.0),
                           child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: (index % 2 == 0)
-                                  ? Colors.pink
-                                  : Colors.deepPurple,
-                            ),
-                            height: 75,
-                            child: ListTile(
-                              leading: IconButton(
-                                  onPressed: () {
-                                    navigateandeditdatas(context);
-                                  },
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: Colors.white,
-                                  )),
-                              title: Text(
-                                model.title.toString(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: (model.iscompleted)
+                                    ? Colors.grey.shade300
+                                    : Colors.teal.shade500,
                               ),
-                              subtitle: Column(
+                              height: 85,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    model.descriptions.toString(),
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  const SizedBox(
-                                    height: 6,
-                                  ),
-                                  Row(
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(
-                                        Icons.alarm,
-                                        size: 14,
-                                        color: Colors.white,
+                                      const SizedBox(
+                                        height: 7,
                                       ),
-                                      Text(
-                                        DateFormat('yyyy-MM-dd h:mm:ss')
-                                            .format(model.datetime!),
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 14),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          model.iscompleted
+                                              ? const Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 5.0),
+                                                  child:
+                                                      Icon(Icons.check_circle),
+                                                )
+                                              : Text(""),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 12.0),
+                                            child: Text(model.title.toString(),
+                                                style: TextStyle(
+                                                    fontSize: 17,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: model.iscompleted
+                                                        ? Colors.black
+                                                        : Colors.white,
+                                                    decorationColor:
+                                                        Colors.white,
+                                                    decorationThickness:
+                                                        model.iscompleted
+                                                            ? 3
+                                                            : 0,
+                                                    decoration: model
+                                                            .iscompleted
+                                                        ? TextDecoration.none
+                                                        : TextDecoration.none)),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Stack(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 12.0),
+                                                child: Icon(
+                                                  Icons.alarm,
+                                                  color: model.iscompleted
+                                                      ? Colors.black
+                                                      : Colors.white,
+                                                  size: 18,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 2.0),
+                                            child: Text(
+                                                DateFormat('HH:mm:a')
+                                                    .format(model.datetime!),
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: model.iscompleted
+                                                        ? Colors.black
+                                                        : Colors.white,
+                                                    decorationColor:
+                                                        Colors.white,
+                                                    decorationThickness:
+                                                        model.iscompleted
+                                                            ? 3
+                                                            : 0,
+                                                    decoration: model
+                                                            .iscompleted
+                                                        ? TextDecoration.none
+                                                        : TextDecoration.none)),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 15.0),
+                                        child: Text(
+                                            model.descriptions.toString(),
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                decorationColor: Colors.white,
+                                                color: model.iscompleted
+                                                    ? Colors.black
+                                                    : Colors.white,
+                                                decorationThickness:
+                                                    model.iscompleted ? 3 : 0,
+                                                decoration: model.iscompleted
+                                                    ? TextDecoration.none
+                                                    : TextDecoration.none)),
                                       ),
                                     ],
-                                  )
+                                  ),
+                                  Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: Text(
+                                          "Features",
+                                          style: TextStyle(
+                                              color: model.iscompleted
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                              fontSize: 14,
+                                              decorationColor: Colors.white,
+                                              decorationThickness:
+                                                  model.iscompleted ? 3 : 0,
+                                              decoration: model.iscompleted
+                                                  ? TextDecoration.none
+                                                  : TextDecoration.none),
+                                        ),
+                                      ),
+                                      Row(children: [
+                                        IconButton(
+                                            onPressed: () {
+                                              navigateandeditdatas(context);
+                                            },
+                                            icon: Icon(
+                                              Icons.edit,
+                                              color: model.iscompleted
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            )),
+                                        IconButton(
+                                            onPressed: () {
+                                              deletedata(model.id);
+                                            },
+                                            icon: Icon(
+                                              Icons.delete,
+                                              color: model.iscompleted
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            )),
+                                      ]),
+                                    ],
+                                  ),
                                 ],
-                              ),
-                              trailing: IconButton(
-                                  onPressed: () {
-                                    deletedata(model.id);
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.white,
-                                  )),
-                            ),
-                          ),
+                              )),
                         );
                       }),
                 ),
