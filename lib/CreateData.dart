@@ -22,28 +22,33 @@ class _RFloatingActionButtonState extends State<RFloatingActionButton> {
   List<Model> allmodels = [];
   DateTime selecteddate = DateTime.now();
   int dropdownvalue = 0;
+  String todotaskstatusvalue = "Task NotCompleted";
   List<int> items = [0, 5, 10, 30];
+  List<String> tasksstatus = ["Task Completed", "Task NotCompleted"];
 
   @override
   Widget build(BuildContext context) {
     void _selecteddate(BuildContext context) async {
-      final pickeddate = await showDatePicker(
+      final DateTime? pickedDate = await showDatePicker(
           context: context,
-          initialDate: selecteddate,
+          initialDate: DateTime.now(),
           firstDate: DateTime(2024),
-          lastDate: DateTime(2028));
-
-      if (pickeddate != null) {
+          lastDate: DateTime(3000));
+      if (pickedDate != null) {
         final pickedtime = await showTimePicker(
             context: context,
             initialTime: TimeOfDay.now(),
             initialEntryMode: TimePickerEntryMode.input);
         setState(() {
-          selecteddate = DateTime(pickeddate.year, pickeddate.month,
-              pickeddate.day, pickedtime!.hour, pickedtime.minute);
-
-          var falseselectedate = selecteddate.toString();
-          selecteddate = DateFormat('yyyy-MM-dd h:mm').parse(falseselectedate);
+          selecteddate = DateTime(pickedDate.year, pickedDate.month,
+              pickedDate.day, pickedtime!.hour, pickedtime.minute);
+          print(selecteddate);
+          print(selecteddate.runtimeType);
+          var falseselectedate =
+              DateFormat('yyyy-MM-dd HH:mm').format(selecteddate);
+          print(falseselectedate);
+          print(falseselectedate.runtimeType);
+          selecteddate = DateTime.parse(falseselectedate);
 
           print(selecteddate);
         });
@@ -52,7 +57,7 @@ class _RFloatingActionButtonState extends State<RFloatingActionButton> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.deepPurple,
+          backgroundColor: Colors.teal.shade500,
           title: const Text(
             "Add Todo Task",
             style: TextStyle(fontSize: 18),
@@ -65,9 +70,9 @@ class _RFloatingActionButtonState extends State<RFloatingActionButton> {
               Container(
                 height: 50,
                 width: Get.context!.width,
-                child: const Card(
-                  color: Colors.deepPurple,
-                  child: Row(
+                child: Card(
+                  color: Colors.teal.shade500,
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
@@ -93,13 +98,13 @@ class _RFloatingActionButtonState extends State<RFloatingActionButton> {
               Container(
                 height: 50,
                 width: Get.context!.width,
-                child: const Card(
-                  color: Colors.deepPurple,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                child: Card(
+                  color: Colors.teal.shade500,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Select Date and Time:",
+                        "    Select Date and Time:",
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -114,7 +119,7 @@ class _RFloatingActionButtonState extends State<RFloatingActionButton> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    DateFormat('yyyy-MM-dd hh:mm').format(selecteddate),
+                    DateFormat('yyyy-MM-dd HH:mm').format(selecteddate),
                     style: TextStyle(fontSize: 15),
                   ),
                   IconButton(
@@ -135,17 +140,17 @@ class _RFloatingActionButtonState extends State<RFloatingActionButton> {
               Container(
                 height: 52,
                 width: Get.context!.width,
-                child: const Card(
-                  color: Colors.deepPurple,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                child: Card(
+                  color: Colors.teal.shade500,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Assign Reminder Time if its your priority Task(Optional)",
+                        "   Assign Reminder Time if its your priority Task(Optional)",
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -181,52 +186,111 @@ class _RFloatingActionButtonState extends State<RFloatingActionButton> {
                 ),
               ),
               const SizedBox(
+                height: 11,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+                child: Container(
+                  height: 52,
+                  width: Get.context!.width,
+                  child: Card(
+                    color: Colors.teal.shade500,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "   Task Status  (Required))",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: DropdownButton<String>(
+                  borderRadius: BorderRadius.circular(5),
+                  elevation: 16,
+                  isExpanded: true,
+                  value: todotaskstatusvalue,
+                  icon: const Icon(Icons.keyboard_arrow_down),
+                  items: tasksstatus
+                      .map<DropdownMenuItem<String>>(
+                        (String e) => DropdownMenuItem(
+                            value: e, child: Text(e.toString())),
+                      )
+                      .toList(),
+                  onChanged: (val) {
+                    setState(() {
+                      todotaskstatusvalue = val!;
+                      print(dropdownvalue);
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(
                 height: 35,
               ),
               SizedBox(
-                height: 48,
+                height: 50,
                 width: 200,
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple, elevation: 5),
+                        backgroundColor: Colors.teal.shade500, elevation: 5),
                     onPressed: () async {
                       final title = titlecontroller.text;
                       final descriptions = descriptioncontroller.text;
                       final datetime = selecteddate;
+                      final iscompleted =
+                          todotaskstatusvalue == "Task NotCompleted"
+                              ? false
+                              : true;
                       print(datetime);
                       dropdownvalue;
 
                       if (title.isEmpty &&
                           descriptions.isEmpty &&
-                          datetime == null) {
+                          datetime == null &&
+                          dropdownvalue == null) {
                         return;
                       } else {
                         final model = Model(
-                            title: title,
-                            descriptions: descriptions,
-                            datetime: datetime,
-                            impdatetime: datetime
-                                .subtract(Duration(minutes: dropdownvalue)));
+                          title: title,
+                          descriptions: descriptions,
+                          datetime: datetime,
+                          imptaskearlier: dropdownvalue,
+                          impdatetime: datetime
+                              .subtract(Duration(minutes: dropdownvalue)),
+                          iscompleted: iscompleted,
+                        );
 
                         await DataBaseHandler.instance.insertdatas(model);
-                        NotificationService.showScheduledNotification(
-                          title: title,
-                          body: descriptions,
-                          datetime: datetime,
-                        );
-                        NotificationService.scheduleimportanttask(
-                            title: title,
-                            body: descriptions,
-                            datetime: datetime,
-                            payload:
-                                "Reminder\t Important Task:\n${dropdownvalue} min left, So be Prepared\n Title:${title}\n Description:${descriptions}\n Time: ${datetime}",
-                            impdatetime: datetime
-                                .subtract(Duration(minutes: dropdownvalue)));
+
+                        if (dropdownvalue == 0) {
+                          NotificationService.showScheduledNotification(
+                              title: title,
+                              body: descriptions,
+                              payload: "Reminder",
+                              datetime: datetime);
+                        } else {
+                          NotificationService.scheduleimportanttask(
+                              title: title,
+                              body: descriptions,
+                              datetime: datetime,
+                              payload:
+                                  "Reminder\t Important Task:\n${dropdownvalue} min left, So be Prepared\n Title:${title}\n Description:${descriptions}\n Time: ${datetime}",
+                              impdatetime: datetime
+                                  .subtract(Duration(minutes: dropdownvalue)));
+                        }
 
                         titlecontroller.clear();
 
                         descriptioncontroller.clear();
-                        datetimecontroller.clear();
 
                         allmodels =
                             await DataBaseHandler.instance.displaydatas();
