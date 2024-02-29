@@ -9,27 +9,50 @@ import 'package:todo_app/Widgets/TextField.dart';
 class UpdateDate extends StatefulWidget {
   final Future<void> funct;
   final Model model;
+  final String initialtitle;
+  final String initialdescriptions;
+  final String initialdatetime;
+  int imptaskearlier;
+  late bool iscompleted;
 
-  UpdateDate({required this.funct, required this.model});
+  UpdateDate(
+      {required this.funct,
+      required this.model,
+      required this.initialtitle,
+      required this.initialdescriptions,
+      required this.initialdatetime,
+      required this.imptaskearlier,
+      required this.iscompleted});
 
   @override
   State<UpdateDate> createState() => _UpdateDateState();
 }
 
 class _UpdateDateState extends State<UpdateDate> {
-  TextEditingController titlecontroller = TextEditingController();
+  late var titlecontroller = TextEditingController();
 
-  TextEditingController descriptioncontroller = TextEditingController();
-
-  TextEditingController datetimecontroller = TextEditingController();
+  late var descriptioncontroller = TextEditingController();
 
   List<Model> allmodels = [];
+  List<String> tasksstatus = ["Task Completed", "Task NotCompleted"];
+  String todotaskstatusvalue = "Task NotCompleted";
 
   DateTime selecteddate = DateTime.now();
 
   int dropdownvalue = 0;
 
   List<int> items = [0, 5, 10, 30];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    titlecontroller = TextEditingController(text: widget.initialtitle);
+    descriptioncontroller =
+        TextEditingController(text: widget.initialdescriptions);
+    selecteddate = DateTime.parse(widget.initialdatetime);
+    widget.iscompleted = widget.iscompleted;
+    widget.imptaskearlier = widget.imptaskearlier;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +82,7 @@ class _UpdateDateState extends State<UpdateDate> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.deepPurple,
+          backgroundColor: Colors.teal.shade500,
           title: const Text(
             "Update Todo Task",
             style: TextStyle(fontSize: 18),
@@ -72,9 +95,9 @@ class _UpdateDateState extends State<UpdateDate> {
             Container(
               height: 50,
               width: Get.context!.width,
-              child: const Card(
-                color: Colors.deepPurple,
-                child: Row(
+              child: Card(
+                color: Colors.teal.shade500,
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -99,9 +122,9 @@ class _UpdateDateState extends State<UpdateDate> {
             Container(
               height: 50,
               width: Get.context!.width,
-              child: const Card(
-                color: Colors.deepPurple,
-                child: Row(
+              child: Card(
+                color: Colors.teal.shade500,
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -133,9 +156,9 @@ class _UpdateDateState extends State<UpdateDate> {
             Container(
               height: 52,
               width: Get.context!.width,
-              child: const Card(
-                color: Colors.deepPurple,
-                child: Row(
+              child: Card(
+                color: Colors.teal.shade500,
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -143,7 +166,7 @@ class _UpdateDateState extends State<UpdateDate> {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -154,12 +177,12 @@ class _UpdateDateState extends State<UpdateDate> {
               height: 13,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: DropdownButton<int>(
                 borderRadius: BorderRadius.circular(5),
                 elevation: 16,
                 isExpanded: true,
-                value: dropdownvalue,
+                value: widget.imptaskearlier,
                 icon: const Icon(Icons.keyboard_arrow_down),
                 items: items
                     .map<DropdownMenuItem<int>>(
@@ -172,14 +195,59 @@ class _UpdateDateState extends State<UpdateDate> {
                     .toList(),
                 onChanged: (val) {
                   setState(() {
-                    dropdownvalue = val!;
-                    print(dropdownvalue);
+                    widget.imptaskearlier = val!;
+                    print(widget.imptaskearlier);
                   });
                 },
               ),
             ),
             const SizedBox(
-              height: 35,
+              height: 11,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+              child: Container(
+                height: 52,
+                width: Get.context!.width,
+                child: Card(
+                  color: Colors.teal.shade500,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Update Task Status(Required))",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: DropdownButton<String>(
+                borderRadius: BorderRadius.circular(5),
+                elevation: 16,
+                isExpanded: true,
+                value: todotaskstatusvalue,
+                icon: const Icon(Icons.keyboard_arrow_down),
+                items: tasksstatus
+                    .map<DropdownMenuItem<String>>(
+                      (String e) =>
+                          DropdownMenuItem(value: e, child: Text(e.toString())),
+                    )
+                    .toList(),
+                onChanged: (val) {
+                  setState(() {
+                    todotaskstatusvalue = val!;
+                    print(dropdownvalue);
+                  });
+                },
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -189,36 +257,48 @@ class _UpdateDateState extends State<UpdateDate> {
                   width: 200,
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple),
+                        backgroundColor: Colors.teal.shade500,
+                      ),
                       onPressed: () async {
                         final title = titlecontroller.text;
                         final description = descriptioncontroller.text;
                         final datetime = selecteddate;
-                        dropdownvalue;
-                        if (title.isNotEmpty &&
-                            description.isNotEmpty &&
+
+                        final iscompleted =
+                            todotaskstatusvalue == "Task NotCompleted"
+                                ? false
+                                : true;
+                        if (title.isEmpty &&
+                            description.isEmpty &&
                             datetime == null) {
                           return;
                         } else {
                           widget.model.title = title;
                           widget.model.descriptions = description;
                           widget.model.datetime = datetime;
+
+                          widget.model.iscompleted = iscompleted;
                           widget.model.impdatetime = datetime
                               .subtract(Duration(minutes: dropdownvalue));
                           DataBaseHandler.instance.updatedatas(widget.model);
-                          NotificationService.showScheduledNotification(
-                              title: widget.model.title!,
-                              body: widget.model.descriptions!,
-                              id: 1,
-                              datetime: widget.model.datetime!);
-                          NotificationService.scheduleimportanttask(
-                              title: widget.model.title!,
-                              body: widget.model.descriptions!,
-                              datetime: widget.model.datetime!,
-                              payload:
-                                  "Reminder\t Important Task:\n${dropdownvalue} min left, So be Prepared\n Title:${widget.model.title}\n Description:${widget.model.descriptions}\n Time: ${widget.model.datetime}",
-                              impdatetime: widget.model.datetime!
-                                  .subtract(Duration(minutes: dropdownvalue)));
+
+                          if (widget.model.imptaskearlier == 0)
+                            NotificationService.showScheduledNotification(
+                                title: widget.model.title!,
+                                body: widget.model.descriptions!,
+                                payload: "Reminder",
+                                datetime: widget.model.datetime!);
+                          else {
+                            NotificationService.scheduleimportanttask(
+                                title: widget.model.title!,
+                                body: widget.model.descriptions!,
+                                datetime: widget.model.datetime!,
+                                payload:
+                                    "Reminder\t Important Task:\n${dropdownvalue} min left, So be Prepared\n Title:${widget.model.title}\n Description:${widget.model.descriptions}\n Time: ${widget.model.datetime}",
+                                impdatetime: widget.model.datetime!.subtract(
+                                    Duration(minutes: dropdownvalue)));
+                          }
+
                           widget.funct;
 
                           descriptioncontroller.clear();
