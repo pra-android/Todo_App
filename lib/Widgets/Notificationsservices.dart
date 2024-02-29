@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart';
@@ -49,7 +50,7 @@ class NotificationService {
       priority: Priority.max,
       importance: Importance.high,
     );
-    //IOS Notificatio Details
+    //IOS Notification Details
     DarwinNotificationDetails darwinNotificationDetails =
         const DarwinNotificationDetails(
       presentAlert: true,
@@ -69,10 +70,12 @@ class NotificationService {
   }
 
   //For Scheduled Notifications
+
   static showScheduledNotification(
       {int? id = 1,
       required String title,
       required String body,
+      required String payload,
       required DateTime datetime}) async {
     print("Succesfuuly send Scheduled notifications");
     AndroidNotificationDetails androidNotificationDetails =
@@ -83,7 +86,7 @@ class NotificationService {
       priority: Priority.max,
       importance: Importance.high,
     );
-    //IOS Notificatio Details
+    //IOS Notification Details
     DarwinNotificationDetails darwinNotificationDetails =
         const DarwinNotificationDetails(
       presentAlert: true,
@@ -91,18 +94,22 @@ class NotificationService {
       presentBanner: true,
       presentBadge: true,
     );
+
     NotificationDetails notis = NotificationDetails(
         iOS: darwinNotificationDetails, android: androidNotificationDetails);
-      TZDateTime _schedulesDailyTime(TimeOfDay timeOfDay) {
-      final now = TZDateTime.now(local);
+
+    TZDateTime _schedulesDailyTime(TimeOfDay timeOfDay) {
+      final nepal = getLocation('Asia/Kathmandu');
+      final now = TZDateTime.now(nepal);
       print(now);
-      TZDateTime scheduledatee = TZDateTime(local, now.year, now.month, now.day,
+      TZDateTime scheduledatee = TZDateTime(nepal, now.year, now.month, now.day,
           timeOfDay.hour, timeOfDay.minute);
       print(scheduledatee);
       print(scheduledatee.runtimeType);
 
       if (scheduledatee.isBefore(now)) {
-        scheduledatee = scheduledatee.add(const Duration(days: 1));
+        scheduledatee = scheduledatee.add(Duration(
+            days: 1, hours: timeOfDay.hour, minutes: timeOfDay.minute));
       }
       return scheduledatee;
     }
@@ -111,14 +118,17 @@ class NotificationService {
         1,
         title,
         body,
-        androidAllowWhileIdle: true,
-          _schedulesDailyTime(
+        _schedulesDailyTime(
             TimeOfDay(hour: datetime.hour, minute: datetime.minute)),
         notis,
+        payload: payload,
+        androidAllowWhileIdle: true,
+        matchDateTimeComponents: DateTimeComponents.time,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime);
   }
 
+  //schedule important task notifications
   static scheduleimportanttask(
       {int? id = 2,
       required String title,
@@ -132,7 +142,7 @@ class NotificationService {
             priority: Priority.max,
             importance: Importance.high);
     DarwinNotificationDetails darwinNotificationDetails =
-        DarwinNotificationDetails(
+        const DarwinNotificationDetails(
       presentAlert: true,
       presentSound: true,
       presentBanner: true,
@@ -141,11 +151,29 @@ class NotificationService {
     NotificationDetails notis = NotificationDetails(
         iOS: darwinNotificationDetails, android: androidNotificationDetails);
 
+    print("Successfully send Important scheduled local Notifications");
+    TZDateTime _scheduledailyimptask(TimeOfDay timeOfDays) {
+      final nepal = getLocation('Asia/Kathmandu');
+      final now = TZDateTime.now(nepal);
+      print(now);
+      TZDateTime scheduledatee = TZDateTime(nepal, now.year, now.month, now.day,
+          timeOfDays.hour, timeOfDays.minute);
+      print(scheduledatee);
+      print(scheduledatee.runtimeType);
+
+      if (scheduledatee.isBefore(now)) {
+        scheduledatee = scheduledatee.add(Duration(
+            days: 1, hours: timeOfDays.hour, minutes: timeOfDays.minute));
+      }
+      return scheduledatee;
+    }
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
       2,
       title,
       body,
-      TZDateTime.from(impdatetime, local),
+      _scheduledailyimptask(
+          TimeOfDay(hour: impdatetime.hour, minute: impdatetime.minute)),
       notis,
       payload: payload,
       androidAllowWhileIdle: true,
